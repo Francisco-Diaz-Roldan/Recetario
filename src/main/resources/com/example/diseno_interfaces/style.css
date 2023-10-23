@@ -1,0 +1,30 @@
+.ventana{
+    -fx-background-image: url("fondo.jpeg");
+    -fx-bacground-size:cover;
+    -fx-background-position:center center;
+
+}
+
+.transparente{
+    -fx-background-color:rgb(0,0,0,0);
+}
+#titulo{
+    -fx-font-size: 30px;
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-weight: bold;
+}
+
+.info{
+    -fx-background-color:green;
+    -fx-padding:5px 20px;
+    -fx-color:white;
+}
+.table-view .table-cell{
+    -fx-border-color: whitesmoke;
+    -fx-padding: 10 px;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #93f9b911;
+    -fx-text-background-color: red;
+}

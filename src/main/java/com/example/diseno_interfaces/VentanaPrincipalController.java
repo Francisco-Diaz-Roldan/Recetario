@@ -3,6 +3,8 @@ package com.example.diseno_interfaces;
 import com.example.diseno_interfaces.models.Receta;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -10,9 +12,11 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.util.StringConverter;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
 
 public class VentanaPrincipalController implements Initializable {
 
@@ -24,7 +28,7 @@ public class VentanaPrincipalController implements Initializable {
     @FXML
     private Slider sliderDuracion;
     @FXML
-    private ComboBox comboDificultad;
+    private ComboBox <String> comboDificultad;  //Si le ponemos <String> luego no necesitaremos castearlo
     @FXML
     private ListView<String> listTipo;
     @FXML
@@ -43,10 +47,25 @@ public class VentanaPrincipalController implements Initializable {
     private Label info;
     @FXML
     private Label lblDuracion;
+    @FXML
+    private MenuItem menuSalir;
+    @FXML
+    private MenuItem menuAcercaDe;
+    @FXML
+    private ComboBox<Receta> comboRecetas;
 
     @FXML
     protected void insertarReceta(ActionEvent actionEvent) {
 
+        if(!txtNombre.getText().isEmpty()){
+            Receta receta = new Receta();
+            receta.setNombre( txtNombre.getText());
+            receta.setTipo( listTipo.getSelectionModel().getSelectedItem() );
+            receta.setDuracion((int) sliderDuracion.getValue());
+            receta.setDificultad(comboDificultad.getSelectionModel().getSelectedItem());
+            tabla.getItems().add(receta);
+            info.setText(receta.toString());
+        }
 
     }
 
@@ -62,7 +81,7 @@ public class VentanaPrincipalController implements Initializable {
         */
         //Si el combo no es estático
         ObservableList<String> datos = FXCollections.observableArrayList();//Es como un arrayList especial para JavaFX
-        datos.addAll("Fácil", "Medio", "Difícil");
+        datos.addAll("Fácil", "Moderada", "Difícil");
         comboDificultad.setItems(datos);
         comboDificultad.getSelectionModel().selectFirst();//Selecciona el primer elemento por defecto
 
@@ -72,11 +91,36 @@ public class VentanaPrincipalController implements Initializable {
         listTipo.getItems().addAll("Desayuno", "Segundo desayuno", "Almuerzo", "SobreAlmuerzo", "Merienda", "Cena", "Recena", "Poscena");
         listTipo.getSelectionModel().select(0);//Selecciona el primer elemento por defecto
 
-        cNombre.setCellValueFactory((fila) -> {
+        sliderDuracion.valueProperty().addListener((observableValue, number, t1) -> {// number -> antiguo valor y t1->nuevoValor
+            lblDuracion.setText(t1.intValue() + " min");//Para que se sincronice cuandp arrastramos el ratón
+        });
+
+       /* txtNombre.textProperty().addListener((ob, vold, vnew) ->{
+            info.setText("antiguo: "+vold+" nuevo: "+vnew);} );*/
+
+        tabla.getSelectionModel().selectedItemProperty().addListener(//Cuando cambie la seleción en la tabla (al hacer click) se hace esto
+                (observable, vOld, vNew) -> {
+                    info.setText(vNew.toString());
+                    txtNombre.setText(vNew.getNombre());
+                    sliderDuracion.setValue(vNew.getDuracion());
+                    listTipo.getSelectionModel().select(vNew.getTipo());
+                    comboDificultad.getSelectionModel().select(vNew.getDificultad());
+                }
+        );
+
+
+        cNombre.setCellValueFactory((fila) -> {         //Inicializador de la tabla, se recomienda ponder todo String y luego convertir
             String nombre = fila.getValue().getNombre().toUpperCase();
             return new SimpleStringProperty(nombre);
         });//Le indicamos de dónde sacamos el valor de esa columna
+
         cDificultad.setCellValueFactory((fila) -> new SimpleStringProperty( fila.getValue().getDificultad()));//Le indicamos de dónde sacamos el valor de esa columna
+
+        cDuracion.setCellValueFactory((fila) -> {         //Inicializador de la tabla, se recomienda ponder todo String y luego convertir
+            return new SimpleStringProperty(fila.getValue().getDuracion()+ "min");
+        });//Le indicamos de dónde sacamos el valor de esa columna
+
+        cTipo.setCellValueFactory( (fila) ->new SimpleStringProperty(fila.getValue().getTipo() ));
 
         tabla.getItems().add(new Receta("Tacos de carne asada", "Almuerzo", 45, "Fácil"));
         tabla.getItems().add(new Receta("Huevos revueltos con tocino", "Desayuno", 15, "Moderada"));
@@ -88,12 +132,55 @@ public class VentanaPrincipalController implements Initializable {
         tabla.getItems().add(new Receta("Batido de frutas", "Merienda", 5, "Fácil"));
         tabla.getItems().add(new Receta("Sopa de pollo casera", "Cena", 40, "Difícil"));
         tabla.getItems().add(new Receta("Pancakes con sirope de arce", "Desayuno", 25, "Moderada"));
+
+        //Indico al comboBox como mostrar una receta creando una clase setConverter
+        comboRecetas.setConverter(new StringConverter<Receta>() {
+            @Override
+            public String toString(Receta receta) {
+                if (receta != null) return receta.getNombre();//Hago que devuelva el nombre de las recetas
+                else return null;
+            }
+
+            @Override
+            public Receta fromString(String s) {
+                return null;
+            }
+        });
+
+        comboRecetas.getItems().addAll(tabla.getItems() );//Le añado toda la tabla
     }
 
     @FXML
     public void actualizarDuracion(Event event) {//Le hemos pasado tambien el Dragged en el visual
-        lblDuracion.setText(Math.round(sliderDuracion.getValue()) + " min");//Para que se sincronice cuandp arrastramos el ratón
+       //lblDuracion.setText(Math.round(sliderDuracion.getValue()) + " min");//Para que se sincronice cuandp arrastramos el ratón
+        //
+    }
+//    @FXML
+//    public void click(ActionEvent actionEvent) {System.out.println(tabla.getSelectionModel().getSelectedItem());    }
 
+    @FXML
+    public void salir(ActionEvent actionEvent) {
+        System.exit(0);
+    }
+
+    @FXML
+    public void mostrarAcercaDe(ActionEvent actionEvent) {
+        var alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText("El Creador");
+        alert.setContentText("Francisco Romero");
+        alert.showAndWait();
+    }
+
+    @FXML
+    public void mostrarReceta(ActionEvent actionEvent) {
     }
 }
+
+
+
+
+
 //Importante actualizar con btn derecho del raton
+//Propiedad no es lo mismo que atributo, un atributo -> algo es negro mientras que la propiedad -> Color, un objeto que tiene algo y puede cambiar
+//El atributo es algo que viene predeterminado
+//La propiedad es algo más cambiante
