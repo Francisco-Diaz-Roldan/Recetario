@@ -24,35 +24,37 @@ public class VentanaPrincipalController implements Initializable {
     @FXML
     private Label welcomeText;
     @FXML
+    private ComboBox<Receta> comboRecetas;
+    @FXML
     private TextField txtNombre;
+    @FXML
+    private ToggleGroup dificultad;
+    @FXML
+    private Label lblDuracion;
     @FXML
     private Slider sliderDuracion;
     @FXML
-    private ComboBox <String> comboDificultad;  //Si le ponemos <String> luego no necesitaremos castearlo
+    private ComboBox comboDificultad;
     @FXML
-    private ListView<String> listTipo;
+    private ListView listTipo;
     @FXML
     private Button btnAñadir;
     @FXML
     private TableView<Receta> tabla;
     @FXML
-    private TableColumn <Receta, String> cNombre;//Recibe elementos Receta y devuelve elementos String -> Se va a extraer un String de Receta
+    private TableColumn<Receta, String> cNombre;
     @FXML
-    private TableColumn <Receta, String>  cDuracion;
+    private TableColumn<Receta, String> cDuracion;
     @FXML
-    private TableColumn <Receta, String>  cDificultad;
+    private TableColumn<Receta, String> cDificultad;
     @FXML
-    private TableColumn <Receta, String>  cTipo;
+    private TableColumn<Receta, String> cTipo;
     @FXML
     private Label info;
-    @FXML
-    private Label lblDuracion;
     @FXML
     private MenuItem menuSalir;
     @FXML
     private MenuItem menuAcercaDe;
-    @FXML
-    private ComboBox<Receta> comboRecetas;
 
     @FXML
     protected void insertarReceta(ActionEvent actionEvent) {
@@ -60,9 +62,9 @@ public class VentanaPrincipalController implements Initializable {
         if(!txtNombre.getText().isEmpty()){
             Receta receta = new Receta();
             receta.setNombre( txtNombre.getText());
-            receta.setTipo( listTipo.getSelectionModel().getSelectedItem() );
+            receta.setTipo((String) listTipo.getSelectionModel().getSelectedItem());
             receta.setDuracion((int) sliderDuracion.getValue());
-            receta.setDificultad(comboDificultad.getSelectionModel().getSelectedItem());
+            receta.setDificultad((String) comboDificultad.getSelectionModel().getSelectedItem());
             tabla.getItems().add(receta);
             info.setText(receta.toString());
         }
@@ -79,7 +81,7 @@ public class VentanaPrincipalController implements Initializable {
 
         comboDificultad.getItems().addAll("básica","hard", "pro");
         */
-        //Si el combo no es estático
+        //Si el combo no es estático. /// ObservableList no se instancia -> NO se pone new delante
         ObservableList<String> datos = FXCollections.observableArrayList();//Es como un arrayList especial para JavaFX
         datos.addAll("Fácil", "Moderada", "Difícil");
         comboDificultad.setItems(datos);
@@ -147,13 +149,13 @@ public class VentanaPrincipalController implements Initializable {
             }
         });
 
-        comboRecetas.getItems().addAll(tabla.getItems() );//Le añado toda la tabla
+        comboRecetas.getItems().addAll(tabla.getItems() );//Le añado toda la tabla y cuando modifico solo cambio 1
+
     }
 
     @FXML
     public void actualizarDuracion(Event event) {//Le hemos pasado tambien el Dragged en el visual
        //lblDuracion.setText(Math.round(sliderDuracion.getValue()) + " min");//Para que se sincronice cuandp arrastramos el ratón
-        //
     }
 //    @FXML
 //    public void click(ActionEvent actionEvent) {System.out.println(tabla.getSelectionModel().getSelectedItem());    }
@@ -173,6 +175,12 @@ public class VentanaPrincipalController implements Initializable {
 
     @FXML
     public void mostrarReceta(ActionEvent actionEvent) {
+        System.out.println(comboRecetas.getSelectionModel().getSelectedItem());
+        tabla.getSelectionModel().select(comboRecetas.getSelectionModel().getSelectedItem());
+        //System.out.println(dificultad.getSelectedToggle().getUserData().toString());
+
+        Session.setRecetaActual(comboRecetas.getSelectionModel().getSelectedItem());
+        HelloApplication.loadFXML("VentanaSecundaria.fxml");
     }
 }
 

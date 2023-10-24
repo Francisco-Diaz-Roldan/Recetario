@@ -1,5 +1,5 @@
 .ventana{
-    -fx-background-image: url("fondo.jpeg");
+    -fx-background-image: url("img/fondo.jpeg");
     -fx-bacground-size:cover;
     -fx-background-position:center center;
 

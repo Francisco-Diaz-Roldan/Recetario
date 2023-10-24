@@ -8,19 +8,21 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-
 
 <BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.diseno_interfaces.VentanaPrincipalController">
    <center>
@@ -42,6 +44,7 @@
                   </font>
                </Label>
                <ComboBox fx:id="comboRecetas" onAction="#mostrarReceta" prefWidth="150.0" />
+               <RadioButton mnemonicParsing="false" text="RadioButton" />
             </VBox>
          </top>
          <center>
@@ -60,6 +63,14 @@
                               <Insets />
                            </VBox.margin>
                         </TextField>
+                        <RadioButton mnemonicParsing="false" selected="true" text="Fácil">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="dificultad" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton mnemonicParsing="false" text="Media" toggleGroup="$dificultad" />
+                        <RadioButton mnemonicParsing="false" text="Difícil" toggleGroup="$dificultad" />
+                        <ToggleButton mnemonicParsing="false" text="ToggleButton" toggleGroup="$dificultad" />
                         <FlowPane hgap="20.0">
                            <children>
                               <Label text="Duración" />
@@ -76,6 +87,7 @@
                         <Label text="Tipo de receta" />
                         <ListView fx:id="listTipo" prefHeight="200.0" prefWidth="200.0" />
                         <Button fx:id="btnAñadir" mnemonicParsing="false" onAction="#insertarReceta" text="Añadir a la tabla" />
+                        <RadioButton mnemonicParsing="false" text="RadioButton" />
                      </children>
                   </VBox>
                   <TableView id="tabla" fx:id="tabla" maxWidth="800.0" minWidth="400.0" prefHeight="249.0" prefWidth="331.0" styleClass="tabla">
